@@ -113,8 +113,8 @@ End Sub
 ---
 
 ## **📌 関連リンク**
-📢 **Qiita記事:** [ESP32 + FreeRTOS + PCA9685でロボットアーム制御](https://qiita.com/) \ud83d\ude80（←実際のリンクを入れる）  
-📢 **TANI-LabのYouTube:** [TANI-Labチャンネル](https://www.youtube.com/@TANI-Lab/featured) \ud83c\udfa5  
+📢 **Qiita記事:** [ESP32 + FreeRTOS + PCA9685でロボットアーム制御]([https://qiita.com/](https://qiita.com/yuji-taniguchi-2/items/626da8b381498d52f22d)) 
+📢 **TANI-LabのYouTube:** [TANI-Labチャンネル](https://www.youtube.com/@TANI-Lab/featured)
 
 ---
 
