@@ -3,6 +3,21 @@ ESP32 を使用し、**FreeRTOS で各軸を同時制御しながら Excel VBA �
 本リポジトリでは、**ESP32のプログラムとExcel VBAのスクリプト**を管理しています。
 
 ---
+## 📘 詳しい情報はこちら
+👉 [TANI-Lab公式ブログ](https://tani-lab.blogspot.com/)
+
+🔗TANI-Labの商品購入先です。
+👉 [TLP-A100 Amazon ](https://amzn.to/40O6x6r)
+👉 [TLP-A300 メルカリ ](https://jp.mercari.com/item/m35213370981)
+👉 [TLP-A300 Amazon　](https://amzn.to/3Cp6Jjg)
+👉 [TLP-A400 Amazon ](https://amzn.to/3Enzduf)
+👉 [TLP-P050 Amazon ](https://amzn.to/4hdklNI)
+👉 [TLP-P055 Amazon ](https://amzn.to/4gkuXcl)
+👉 [TLP-P120 Amazon ](https://amzn.to/3EhnI7D)
+👉 [TLP-P150 Amazon ](https://amzn.to/4jDk9sO)
+
+---
+
 
 ## **\ud83d\udcc8 環境情報**
 | 項目 | 使用ハードウェア / ソフトウェア |
