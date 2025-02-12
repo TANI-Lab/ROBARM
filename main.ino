@@ -72,7 +72,7 @@ void servoTask(void *pvParameters) {
             }
 
             // **PWMに変換して送信**
-            int pwm_value = (int)mapFloat(current_angles[channel], 0.0, 180.0, SERVO_MIN, SERVO_MAX);
+            int pwm_value = (int)mapFloat(current_angles[channel], 0.0, 180.0, (float)SERVO_MIN, (float)SERVO_MAX);
             PcaCommand command = {channel, pwm_value};
             xQueueSend(pcaQueue, &command, portMAX_DELAY);
 
