@@ -33,42 +33,42 @@ void servoTask(void *pvParameters) {
     int channel = (int)pvParameters;
     bool isMoving = false;
     float velocity = 0.0;  // 現在の速度
-    float maxVelocity = 5.0;  // 最大速度（角度変化量）
-    float acceleration = 0.5;  // 加速度（角度増分）
+    float maxVelocity = 3.0;  // 最大速度（さらに高速化）
+    float acceleration = 0.3;  // 加速度（加速をさらに速く）
     float decelerationPoint = 10.0; // 減速開始する距離（目標角度との差）
 
     while (true) {
         float angleDiff = abs(target_angles[channel] - current_angles[channel]);  // 目標との差分
 
         if (angleDiff > 0.1) { // 目標角度に達していない場合
-            if (isMoving == false){
-              // 立ち上がり 移動距離が減速開始距離より小さい場合、移動速度を最大から計算する
-              if (angleDiff <= decelerationPoint){
-                velocity = maxVelocity;
-              }
+            if (!isMoving) {
+                velocity = (angleDiff <= decelerationPoint) ? angleDiff * 0.5 : 0.5;
             }
             isMoving = true;
 
             // **加速フェーズ**
             if (velocity < maxVelocity && angleDiff > decelerationPoint) {
-                velocity += acceleration;  // 加速
+                velocity += acceleration;  
                 if (velocity > maxVelocity) velocity = maxVelocity; // 最大速度制限
             }
 
             // **減速フェーズ**
             if (angleDiff < decelerationPoint) {
-                velocity -= acceleration;  // 減速
-                if (velocity < angleDiff) velocity = angleDiff; // 停止直前は最小速度
+                velocity -= acceleration * 0.8;  // 減速を滑らかにする
+                velocity = max(angleDiff * 0.5, 0.1); // 最小速度を0.3以上にする
             }
 
             // **移動**
-            if ( angleDiff < velocity ){
-              velocity=angleDiff;
-            }
             if (current_angles[channel] < target_angles[channel]) {
                 current_angles[channel] += velocity;
+                if (current_angles[channel] > target_angles[channel]) {
+                    current_angles[channel] = target_angles[channel];
+                }
             } else {
                 current_angles[channel] -= velocity;
+                if (current_angles[channel] < target_angles[channel]) {
+                    current_angles[channel] = target_angles[channel];
+                }
             }
 
             // **PWMに変換して送信**
@@ -76,9 +76,9 @@ void servoTask(void *pvParameters) {
             PcaCommand command = {channel, pwm_value};
             xQueueSend(pcaQueue, &command, portMAX_DELAY);
 
-            // **速度に応じたディレイ（台形加減速）**
-            int iMTDelay = (int)(50 / velocity);
-            vTaskDelay(pdMS_TO_TICKS(iMTDelay)); 
+            // **速度に応じたディレイ（高速化）**
+            int iMTDelay = (int)(20 / velocity); // 30 → 20 に変更し、さらに高速化
+            vTaskDelay(pdMS_TO_TICKS(iMTDelay));
 
         } else { // **目標角度に到達**
             if (isMoving) {
@@ -88,19 +88,22 @@ void servoTask(void *pvParameters) {
                 isMoving = false;
                 velocity = 0.0; // 停止時に速度リセット
             }
-            vTaskDelay(pdMS_TO_TICKS(50)); // CPU負荷を抑えるための遅延
+            vTaskDelay(pdMS_TO_TICKS(5));
         }
     }
 }
+
+
 
 // PCA9685の書き込みタスク
 void pcaTask(void *pvParameters) {
     PcaCommand command;
     while (xQueueReceive(pcaQueue, &command, portMAX_DELAY) == pdPASS) {
-        if ( command.pwm_value == -1 ){
-          Serial.printf("DONE %d\n", command.channel);
-        }else{
-          pwm.setPWM(command.channel, 0, command.pwm_value);
+        if (command.pwm_value == -1) {
+            // **ここで移動完了を通知**
+            Serial.printf("DONE %d\n", command.channel);
+        } else {
+            pwm.setPWM(command.channel, 0, command.pwm_value);
         }
     }
 }
@@ -135,7 +138,7 @@ void serialTask(void *pvParameters) {
                 }
             }
         }
-        vTaskDelay(pdMS_TO_TICKS(10));
+        vTaskDelay(pdMS_TO_TICKS(5));
     }
 }
 
@@ -153,6 +156,10 @@ void setup() {
     pwm.setPWM(4, 0, pwm_value);
     delay(300);
     pwm.setPWM(0, 0, pwm_value);
+
+    pwm_value = map(0, 0, 180, SERVO_MIN, SERVO_MAX);
+    pwm.setPWM(5, 0, pwm_value);
+    
     Serial.println("INFO:Homing complete!");
 
     
